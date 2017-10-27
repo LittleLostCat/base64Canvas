@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<input id="picture" type="file" accept="image/*">
+	<canvas id="myCanvas"></canvas>
+	<a id="changePic" href="" download="导出图片">下载</a>
+</body>
+<script>
+	window.onload = function(){
+	　　var input = document.getElementById("picture");
+	　　if ( typeof(FileReader) === 'undefined' ){
+	　　　　console.log("抱歉，你的浏览器不支持 FileReader，请使用现代浏览器操作！");
+	　　　　input.setAttribute( 'disabled','disabled' );
+	　　} else {
+	　　　　input.addEventListener( 'change',readFile,false );
+	　　}
+	}
+
+	function readFile(){
+	    var file = this.files[0];//获取input输入的图片
+	    if(!/image\/\w+/.test(file.type)){
+	        alert("请确保文件为图像类型");
+	        return false;
+	    }//判断是否图片，在移动端由于浏览器对调用file类型处理不同，虽然加了accept = 'image/*'，但是还要再次判断
+	    var reader = new FileReader();
+	    reader.readAsDataURL(file);//转化成base64数据类型
+	    reader.onload = function(e){
+            drawToCanvas(this.result);
+        }
+    }
+	
+	function drawToCanvas(imgData){
+    	var cvs = document.querySelector('#myCanvas');
+    	var down = document.querySelector("#changePic");
+        cvs.width=300;
+        cvs.height=400;
+        var ctx = cvs.getContext('2d');
+        var img = new Image;
+        img.src = imgData;
+        img.onload = function(){//必须onload之后再画
+            ctx.drawImage(img,0,0,300,400);
+            strDataURI = cvs.toDataURL("image/jpeg");//获取canvas base64数据
+    		down.href = strDataURI;
+        }
+	}
+</script>
+</html>
